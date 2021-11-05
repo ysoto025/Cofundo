@@ -33,6 +33,9 @@ def start():
                 packet.connId = packet_from_server.connId
                 packet.isAck = True
                 sock.sento(packet.encode(), (args.host, int(args.port)))
+            else:
+                sys.stderr.write("ERROR: FLAGS were not active")
+                sys.exit(1)
 
             with open(args.file, "rb") as f:
                 data = f.read(50000)
