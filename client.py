@@ -6,6 +6,7 @@ import socket
 import sys
 
 import confundo
+from confundo.packet import Packet
 
 parser = argparse.ArgumentParser("Parser")
 parser.add_argument("host", help="Set Hostname")
@@ -18,6 +19,20 @@ def start():
         with confundo.Socket() as sock:
             sock.settimeout(10)
             sock.connect((args.host, int(args.port)))
+
+            packet = Packet()
+            packet.seqNum = 77
+            packet.connId = 0
+            packet.ackNum = 0
+            packet.isSyn = True
+
+            sock.sendto(packet.encode(), (args.host, int(args.port)))
+            packet_from_server = Packet(sock.recv(424)).decode()
+
+            if packet_from_server.isSyn and packet_from_server.isAck:
+                packet.connId = packet_from_server.connId
+                packet.isAck = True
+                sock.sento(packet.encode(), (args.host, int(args.port)))
 
             with open(args.file, "rb") as f:
                 data = f.read(50000)
