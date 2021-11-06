@@ -96,7 +96,8 @@ class Socket:
             if pkt and pkt.isSyn:
                 hadNewConnId = True
                 ### UPDATE CORRECTLY HERE
-                self.inSeq = pkt.seqNum
+                self.seqNum = pkt.seqNum
+                self.inSeq = pkt.seqNum +1
                 clientSock = Socket(connId=self.connId, synReceived=True, sock=self.sock,
                                     inSeq=self.inSeq, noClose=True)
                 # at this point, syn was received, ack for syn was sent, now need to send our SYN and wait for ACK
