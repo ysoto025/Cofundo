@@ -32,7 +32,7 @@ class Socket:
         self.sock.settimeout(0.5)
         self.timeout = 10
 
-        self.base = 12345
+        self.base = 77
         self.seqNum = self.base
 
         self.inSeq = inSeq
@@ -110,12 +110,12 @@ class Socket:
 
     def _send(self, packet):
         '''"Private" method to send packet out'''
-
+        print(format_line("SEND", packet, -1, -1))
         if self.remote:
             self.sock.sendto(packet.encode(), self.remote)
         else:
             self.sock.sendto(packet.encode(), self.lastFromAddr)
-        print(format_line("SEND", packet, -1, -1))
+        ##print(format_line("SEND", packet, -1, -1))
 
     def _recv(self):
         '''"Private" method to receive incoming packets'''
@@ -128,6 +128,8 @@ class Socket:
         ### TODO dispatch based on fromAddr... and it can only be done from the "parent" socket
 
         inPkt = Packet().decode(inPacket)
+
+        print("send ", inPkt.seqNum)
         print(format_line("RECV", inPkt, -1, -1))
 
         outPkt = None
@@ -138,7 +140,8 @@ class Socket:
                 self.connId = inPkt.connId
             self.synReceived = True
 
-            outPkt = Packet(seqNum=self.seqNum, ackNum=self.inSeq, connId=self.connId, isAck=True)
+
+            outPkt = Packet(seqNum=inPkt.seqNum, ackNum=self.inSeq, connId=self.connId, isAck=True)
 
         elif inPkt.isFin:
             if self.inSeq == inPkt.seqNum: # all previous packets has been received, so safe to advance
@@ -149,7 +152,7 @@ class Socket:
                 # don't advance, which means we will send a duplicate ACK
                 pass
 
-            outPkt = Packet(seqNum=self.seqNum, ackNum=self.inSeq, connId=self.connId, isAck=True)
+            outPkt = Packet(seqNum=inPkt.seqNum, ackNum=self.inSeq, connId=self.connId, isAck=True)
 
         elif len(inPkt.payload) > 0:
             if not self.synReceived:
@@ -166,7 +169,9 @@ class Socket:
                 # don't advance, which means we will send a duplicate ACK
                 pass
 
-            outPkt = Packet(seqNum=self.seqNum, ackNum=self.inSeq, connId=self.connId, isAck=True)
+            outPkt = Packet(seqNum=inPkt.seqNum, ackNum=self.inSeq, connId=self.connId, isAck=True)
+
+        print(outPkt)
 
         if outPkt:
             self._send(outPkt)
@@ -204,6 +209,7 @@ class Socket:
         startTime = time.time()
         while True:
             pkt = self._recv()
+
             if pkt and pkt.isAck and pkt.ackNum == self.seqNum:
                 self.base = self.seqNum
                 self.state = State.OPEN
@@ -273,7 +279,7 @@ class Socket:
             pkt = self._recv()  # if within RTO we didn't receive packets, things will be retransmitted
             if pkt and pkt.isAck:
                 ### UPDATE CORRECTLY HERE
-                # advanceAmount = ???
+                advanceAmount = 0
                 if advanceAmount == 0:
                     self.nDupAcks += 1
                 else:

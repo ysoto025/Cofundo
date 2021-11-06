@@ -26,14 +26,19 @@ class Header:
         self.isFin = isFin
 
     def encode(self):
+        print("header", self)
         flags = 0
         if self.isAck:
             flags = flags | (1 << 2)
         if self.isSyn:
             print("SYN in")
+            print(self.isSyn)
             flags = flags | (1 << 1)
         if self.isFin:
             flags = flags | (1)
+
+        print(self.seqNum)
+
         return struct.pack("!IIHH",
                            self.seqNum,
                            self.ackNum,

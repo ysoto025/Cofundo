@@ -18,4 +18,5 @@ class Packet(Header):
         return self
 
     def encode(self):
+        print("packet", self)
         return super(Packet, self).encode() + self.payload

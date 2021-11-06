@@ -6,6 +6,7 @@ import socket
 import sys
 
 import confundo
+from confundo.header import Header
 from confundo.packet import Packet
 
 parser = argparse.ArgumentParser("Parser")
@@ -20,19 +21,16 @@ def start():
             sock.settimeout(10)
             sock.connect((args.host, int(args.port)))
 
-            packet = Packet()
-            packet.seqNum = 77
-            packet.connId = 0
-            packet.ackNum = 0
-            packet.isSyn = True
-
-            sock.sendto(packet.encode(), (args.host, int(args.port)))
+            header = Header(77, 0, 0, True)
+            packet = Packet(header)
+            print(packet)
+            sock.send("pack", packet)
             packet_from_server = Packet(sock.recv(424)).decode()
 
             if packet_from_server.isSyn and packet_from_server.isAck:
                 packet.connId = packet_from_server.connId
                 packet.isAck = True
-                sock.sen(packet.encode())
+                sock.send(packet.encode())
             else:
                 sys.stderr.write("ERROR:  FLAGS were not active")
                 sys.exit(0)
