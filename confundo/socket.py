@@ -94,6 +94,7 @@ class Socket:
                 hadNewConnId = False
             pkt = self._recv()
             if pkt and pkt.isSyn:
+                print("Packet received")
                 hadNewConnId = True
                 ### UPDATE CORRECTLY HERE
                 self.seqNum = pkt.seqNum
