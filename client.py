@@ -17,6 +17,8 @@ args = parser.parse_args()
 def start():
     try:
         with confundo.Socket() as sock:
+            sock.settimeout(10)
+            sock.connect((args.host, int(args.port)))
 
             packet = Packet()
             packet.seqNum = 77
@@ -24,21 +26,16 @@ def start():
             packet.ackNum = 0
             packet.isSyn = True
 
-            sock.sendto(packet.encode(), (args.host, int(args.port)))
+            sock.sendto(packet, (args.host, int(args.port)))
             packet_from_server = Packet(sock.recv(424)).decode()
 
             if packet_from_server.isSyn and packet_from_server.isAck:
                 packet.connId = packet_from_server.connId
                 packet.isAck = True
-                sock.sento(packet.encode(), (args.host, int(args.port)))
+                sock.sen(packet.encode())
             else:
-                sys.stderr.write("ERROR: FLAGS were not active")
+                sys.stderr.write("ERROR:  FLAGS were not active")
                 sys.exit(0)
-
-        with confundo.Socket() as sock:
-            sock.settimeout(10)
-            sock.connect((args.host, int(args.port)))
-
 
             with open(args.file, "rb") as f:
                 data = f.read(50000)
