@@ -35,7 +35,7 @@ def start():
                 sock.sento(packet.encode(), (args.host, int(args.port)))
             else:
                 sys.stderr.write("ERROR: FLAGS were not active")
-                sys.exit(1)
+                sys.exit(0)
 
             with open(args.file, "rb") as f:
                 data = f.read(50000)
@@ -48,6 +48,7 @@ def start():
     except RuntimeError as e:
         sys.stderr.write(f"ERROR: {e}\n")
         sys.exit(1)
+
 
 if __name__ == '__main__':
     start()
