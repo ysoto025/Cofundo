@@ -37,7 +37,7 @@ class Header:
                            self.seqNum,
                            self.ackNum,
                            self.connId,
-                           flags)
+                           int(flags))
 
     def decode(self, packet):
         (self.seqNum, self.ackNum, self.connId, flags) = struct.unpack("!IIHH", packet)
