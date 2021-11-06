@@ -30,6 +30,7 @@ class Header:
         if self.isAck:
             flags = flags | (1 << 2)
         if self.isSyn:
+            print("SYN in")
             flags = flags | (1 << 1)
         if self.isFin:
             flags = flags | (1)
@@ -37,7 +38,7 @@ class Header:
                            self.seqNum,
                            self.ackNum,
                            self.connId,
-                           int(flags))
+                           flags)
 
     def decode(self, packet):
         (self.seqNum, self.ackNum, self.connId, flags) = struct.unpack("!IIHH", packet)
