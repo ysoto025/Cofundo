@@ -34,8 +34,10 @@ class Header:
         if self.isFin:
             flags = flags | (1)
         return struct.pack("!IIHH",
-                           self.seqNum, self.ackNum,
-                           self.connId, flags)
+                           self.seqNum,
+                           self.ackNum,
+                           self.connId,
+                           flags)
 
     def decode(self, packet):
         (self.seqNum, self.ackNum, self.connId, flags) = struct.unpack("!IIHH", packet)

@@ -26,7 +26,7 @@ def start():
             packet.ackNum = 0
             packet.isSyn = True
 
-            sock.sendto(packet, (args.host, int(args.port)))
+            sock.sendto(packet.encode(), (args.host, int(args.port)))
             packet_from_server = Packet(sock.recv(424)).decode()
 
             if packet_from_server.isSyn and packet_from_server.isAck:
